@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TraceGuard — Autonomous Security Incident Investigator
-Hackathon Track 01: Agents That Act on Connected Data
+Graph-Native Enterprise Incident Investigation & Automated Containment
 
 Run this script to start the TraceGuard SOC Command Center:
     python run.py
@@ -22,8 +22,8 @@ BANNER = r"""
     | | | | (_| | (_|  __/| |__| | |_| | (_| | | | (_| |
     |_|_|  \__,_|\___\___| \_____|\__,_|\__,_|_|  \__,_|
                                                         
- Autonomous Security Incident Investigator & Connected Data Agent
- Track 01: Agents That Act on Connected Data
+ Autonomous Security Incident Investigator & Connected Security Intelligence
+ Enterprise Multi-Hop Graph Reasoning & Targeted Containment
 ================================================================================
  [✓] Multi-Hop Graph Reasoning Engine: NetworkX DiGraph
  [✓] Model Context Protocol (MCP) Server: Active on JSON-RPC / REST / WS

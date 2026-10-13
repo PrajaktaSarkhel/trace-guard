@@ -1,24 +1,24 @@
 # 🛡️ TraceGuard — Autonomous Security Incident Investigator
 
-> **Hackathon Track 01: Agents That Act on Connected Data**  
-> *An autonomous AI agent that investigates suspicious enterprise activity through multi-hop graph reasoning, executes graph algorithms via Model Context Protocol (MCP) tools, and takes targeted containment actions with explainable forensic evidence.*
+> *An autonomous AI-powered security incident investigator that inspects suspicious enterprise activity through multi-hop graph reasoning, executes graph algorithms via Model Context Protocol (MCP) tools, and takes targeted containment actions with explainable forensic evidence.*
 
-[![Track](https://img.shields.io/badge/Track-01%20Agents%20That%20Act%20on%20Connected%20Data-blueviolet?style=for-the-badge)](https://github.com)
+[![Architecture](https://img.shields.io/badge/Architecture-Graph--Native%20SOC-7928ca?style=for-the-badge)](https://github.com/PrajaktaSarkhel/trace-guard)
 [![Protocol](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol%20(MCP)-00f2fe?style=for-the-badge)](https://modelcontextprotocol.io)
 [![Engine](https://img.shields.io/badge/Graph%20Engine-NetworkX%20DiGraph-38ef7d?style=for-the-badge)](https://networkx.org)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-white?style=for-the-badge)](LICENSE)
 
 ---
 
-## 📌 The Problem & Track 01 Alignment
+## 📌 The Problem & Motivation
 
 Traditional Security Information and Event Management (SIEM) and Security Orchestration (SOAR) platforms generate thousands of alerts in isolation. Security Analysts are forced to manually correlate disjointed tables: *Who logged in? From what laptop? Which IAM role did they assume? What files did they read? Where was the data transferred?*
 
 **TraceGuard transforms security investigations from disconnected log searches into autonomous graph traversals.**
 
-### 🎯 Key Focus Areas of Track 01 in TraceGuard
+### 🎯 Core Engineering Innovations
 
-| Track 01 Requirement | How TraceGuard Solves It |
+| Engineering Capability | How TraceGuard Solves It |
 | :--- | :--- |
 | **Multi-Hop Reasoning** | Instead of stopping at a single user risk score, TraceGuard traverses `Alert ➔ User ➔ Device ➔ Session ➔ Permission ➔ File ➔ C2 IP` across 3 to 6 hops to reconstruct the full attack chain. |
 | **Graph Queries & Algorithms as Agent Tools** | The agent wields real graph algorithms as tools: **Dijkstra Shortest Attack Path**, **Blast Radius Calculation**, **Betweenness & Degree Centrality** (identifying shared choke points like bastion hosts), and **Neighborhood Expansion**. |
@@ -108,7 +108,7 @@ TraceGuard implements the Model Context Protocol (MCP) with 5 production-grade t
 
 ---
 
-## 🎬 Pre-Loaded Scenarios (Ready for Hackathon Judging)
+## 🎬 Enterprise Threat Scenarios
 
 1. **Scenario 1: Lateral Movement & S3 Data Exfiltration**
    - *Alert:* Impossible Travel Login for Alice Vance (`usr-alice`) from St. Petersburg, Russia.
@@ -137,7 +137,7 @@ TraceGuard implements the Model Context Protocol (MCP) with 5 production-grade t
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/trace-guard.git
+git clone https://github.com/PrajaktaSarkhel/trace-guard.git
 cd trace-guard
 
 # Create and activate virtual environment
@@ -161,7 +161,7 @@ python run.py
 
 The application will start at **`http://127.0.0.1:8000`** and automatically open your default browser.
 
-*(Optional)* If you wish to enable LLM generation with your Gemini or OpenAI API key, copy `.env.example` to `.env` and insert your key. If no key is provided, TraceGuard automatically runs using its built-in intelligent engine so judges can evaluate it immediately with zero configuration!
+*(Optional)* If you wish to enable live LLM generation with your Gemini or OpenAI API key, copy `.env.example` to `.env` and insert your key. If no external key is provided, TraceGuard runs out of the box using its built-in deterministic reasoning engine with zero setup required.
 
 ---
 
@@ -176,7 +176,7 @@ python -m unittest discover -s backend/tests
 
 ---
 
-## 💡 How to Demonstrate to Judges (2-Minute Demo)
+## 💡 Interactive SOC Walkthrough (Live Demonstration)
 
 1. **Select a Scenario**: In the top navigation bar, choose `1. Lateral Movement & S3 Exfiltration`. Notice the alert details and connected topology graph loaded on screen.
 2. **Start Investigation**: Click **⚡ Start Autonomous Investigation**.
@@ -184,6 +184,14 @@ python -m unittest discover -s backend/tests
 4. **Inspect Graph Highlights**: See nodes glow and change risk colors in real time. Click on any node (e.g. `srv-bastion-prod` or `customers_ssn_vault_2026.parquet`) to view its deep forensic metadata.
 5. **Human-in-the-Loop Mitigation**: Switch to the **Mitigation (HITL)** tab. Review the pending action: `Detach IAM policy and revoke elevated access`. Click **✅ Approve & Execute Containment**. Watch the node immediately turn neon green (`CONTAINED`) across the entire SOC graph!
 6. **Export Report**: Switch to the **Report** tab to view the generated forensic summary or click **📋 Copy Markdown** / **📥 Export JSON**.
+
+---
+
+## 👤 Author
+
+**Prajakta Sarkhel**  
+- GitHub: [@PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
+- Project: [TraceGuard](https://github.com/PrajaktaSarkhel/trace-guard)
 
 ---
 
