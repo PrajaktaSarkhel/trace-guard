@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TraceGuard — Autonomous Security Incident Investigator</title>
+  <meta name="description" content="Autonomous AI Agent investigating security incidents through multi-hop graph reasoning and Model Context Protocol (MCP). Built for Track 01: Agents That Act on Connected Data.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Cytoscape for Force-Directed Connected Data Graph -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation / SOC Command Bar -->
+  <header class="soc-header">
+    <div class="brand-container">
+      <div class="brand-icon-shield">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">TraceGuard <span class="badge-track">Track 01: Connected Data</span></div>
+        <div class="brand-subtitle">Autonomous Security Incident Investigator &bull; Multi-Hop Graph Reasoning via MCP</div>
+      </div>
+    </div>
+
+    <!-- Scenario Selector -->
+    <div class="scenario-selector-group">
+      <label for="scenarioSelect">Incident Scenario:</label>
+      <select id="scenarioSelect" class="cyber-select">
+        <option value="scenario_lateral_exfil">1. Lateral Movement & S3 Exfiltration</option>
+        <option value="scenario_insider_sabotage">2. Insider Threat & Supply Chain Tampering</option>
+        <option value="scenario_ransomware_staging">3. Ransomware Precursor & Backup Hijacking</option>
+      </select>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <div class="agent-live-pulse" id="agentStatusPulse">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="agentStatusText">AGENT READY</span>
+      </div>
+      <button id="btnInvestigate" class="cyber-btn btn-primary pulse-glow">
+        <span class="btn-icon">⚡</span> Start Autonomous Investigation
+      </button>
+      <button id="btnCustomAlert" class="cyber-btn btn-secondary">
+        <span class="btn-icon">🎯</span> Custom Alert
+      </button>
+    </div>
+  </header>
+
+  <!-- Alert Banner -->
+  <section class="alert-trigger-bar" id="alertBar">
+    <div class="alert-badge critical" id="alertSeverity">CRITICAL</div>
+    <div class="alert-info">
+      <strong id="alertTitle">Critical: Impossible Travel & Anomalous Egress Detected</strong>
+      <span class="alert-details" id="alertDesc">User 'alice.vance' authenticated from St. Petersburg, Russia (194.26.29.112)...</span>
+    </div>
+    <div class="alert-meta">
+      <span class="meta-tag" id="alertSource">Source: GuardDuty + Okta</span>
+      <span class="meta-tag mitre" id="alertMitre">MITRE: T1078.004</span>
+    </div>
+  </section>
+
+  <!-- Main Workspace: Split Screen -->
+  <main class="main-workspace">
+    <!-- Left Area: Interactive Graph Visualizer -->
+    <section class="graph-section">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <h2 class="panel-title">Connected Security Topology Graph</h2>
+          <span class="panel-subtitle">Users &rarr; Devices &rarr; Sessions &rarr; Permissions &rarr; Files &rarr; IPs</span>
+        </div>
+        <div class="graph-controls">
+          <button id="btnFitGraph" class="icon-btn" title="Reset View">⛶ Fit</button>
+          <button id="btnHighlightPath" class="icon-btn" title="Highlight Attack Path">⚡ Attack Path</button>
+          <button id="btnToggleLayout" class="icon-btn" title="Toggle Layout">🔄 Re-Layout</button>
+        </div>
+      </div>
+
+      <!-- Graph Canvas Container -->
+      <div class="graph-canvas-wrapper">
+        <div id="cy" class="cytoscape-container"></div>
+
+        <!-- Graph HUD Metrics Overlay -->
+        <div class="graph-hud">
+          <div class="hud-metric">
+            <span class="hud-label">Blast Radius</span>
+            <span class="hud-value danger" id="hudBlastRadius">--</span>
+          </div>
+          <div class="hud-metric">
+            <span class="hud-label">Crown Jewels</span>
+            <span class="hud-value warning" id="hudCrownJewels">--</span>
+          </div>
+          <div class="hud-metric">
+            <span class="hud-label">Active Entities</span>
+            <span class="hud-value" id="hudTotalNodes">--</span>
+          </div>
+          <div class="hud-metric">
+            <span class="hud-label">Bridge Choke Point</span>
+            <span class="hud-value cyan" id="hudChokePoint">Analyzing...</span>
+          </div>
+        </div>
+
+        <!-- Node Details Popover / Drawer -->
+        <div class="node-inspector" id="nodeInspector" style="display: none;">
+          <div class="inspector-header">
+            <span class="inspector-type" id="inspectType">USER</span>
+            <button class="close-inspector" id="btnCloseInspector">&times;</button>
+          </div>
+          <h3 class="inspector-title" id="inspectLabel">Alice Vance</h3>
+          <div class="inspector-risk-bar">
+            <span>Risk Score:</span>
+            <span class="risk-score-badge" id="inspectRisk">75/100</span>
+          </div>
+          <div class="inspector-properties" id="inspectProps"></div>
+          <div class="inspector-actions">
+            <button class="inspect-btn-quarantine" id="btnInspectAction">Remediate Entity</button>
+          </div>
+        </div>
+
+        <!-- Graph Legend -->
+        <div class="graph-legend">
+          <div class="legend-item"><span class="legend-dot user"></span> User</div>
+          <div class="legend-item"><span class="legend-dot device"></span> Device</div>
+          <div class="legend-item"><span class="legend-dot session"></span> Session</div>
+          <div class="legend-item"><span class="legend-dot permission"></span> Permission</div>
+          <div class="legend-item"><span class="legend-dot file"></span> File/Vault</div>
+          <div class="legend-item"><span class="legend-dot ip"></span> Adversary IP</div>
+          <div class="legend-item"><span class="legend-ring crown"></span> Crown Jewel</div>
+          <div class="legend-item"><span class="legend-ring contained"></span> Contained</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Area: Multi-Hop Reasoning Stream & Actions -->
+    <aside class="sidebar-section">
+      <!-- Tabs -->
+      <nav class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="reasoningTab">
+          <span class="tab-badge">1</span> Agent Reasoning
+        </button>
+        <button class="tab-btn" data-tab="evidenceTab">
+          <span class="tab-badge" id="evidenceBadgeCount">0</span> Evidence Chain
+        </button>
+        <button class="tab-btn" data-tab="actionsTab">
+          <span class="tab-badge warning-badge" id="actionBadgeCount">0</span> Mitigation (HITL)
+        </button>
+        <button class="tab-btn" data-tab="reportTab">
+          <span class="tab-badge">Report</span>
+        </button>
+      </nav>
+
+      <!-- Tab 1: Live Agent Reasoning Stream -->
+      <div class="tab-content active" id="reasoningTab">
+        <div class="reasoning-header">
+          <div class="agent-mode-tag">
+            <span class="sparkle">✦</span> Multi-Hop ReAct Engine &bull; MCP Tools
+          </div>
+          <div class="agent-timer" id="agentTimer">0.0s</div>
+        </div>
+
+        <div class="reasoning-stream" id="reasoningStream">
+          <div class="empty-state" id="streamPlaceholder">
+            <div class="empty-icon">🛡️</div>
+            <h3>Autonomous Agent Standby</h3>
+            <p>Click <strong>Start Autonomous Investigation</strong> to watch TraceGuard traverse connected nodes, call MCP graph tools, and uncover the full attack narrative.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Evidence Chain & MITRE Attack Mapping -->
+      <div class="tab-content" id="evidenceTab">
+        <div class="evidence-container">
+          <div class="section-title-sm">Sequential Chain of Evidence</div>
+          <p class="section-desc">Mathematical path discovered through multi-hop graph queries:</p>
+          <div class="chain-timeline" id="chainTimeline">
+            <div class="empty-state-sm">No active evidence chain yet. Run an investigation.</div>
+          </div>
+
+          <div class="section-title-sm mt-4">MITRE ATT&CK Matrix Mapping</div>
+          <div class="mitre-table-wrapper">
+            <table class="mitre-table" id="mitreTable">
+              <thead>
+                <tr>
+                  <th>Tactic</th>
+                  <th>Technique</th>
+                  <th>Graph Proof</th>
+                </tr>
+              </thead>
+              <tbody id="mitreBody">
+                <tr><td colspan="3" class="text-muted">Awaiting investigation...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Mitigation & Human-in-the-Loop Actions -->
+      <div class="tab-content" id="actionsTab">
+        <div class="actions-container">
+          <div class="section-title-sm">Automated Containment Actions</div>
+          <p class="section-desc">Immediate low-risk isolation executed by TraceGuard:</p>
+          <div class="action-list" id="autoActionsList">
+            <div class="empty-state-sm">No automated actions taken yet.</div>
+          </div>
+
+          <div class="section-title-sm mt-4">Human-in-the-Loop (HITL) Approval Gate</div>
+          <p class="section-desc">Critical infrastructure actions requiring security analyst approval:</p>
+          <div class="action-list" id="pendingActionsList">
+            <div class="empty-state-sm">No actions currently pending approval.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Executive Incident Report -->
+      <div class="tab-content" id="reportTab">
+        <div class="report-container">
+          <div class="report-actions-bar">
+            <button class="cyber-btn btn-sm btn-secondary" id="btnCopyReport">📋 Copy Markdown</button>
+            <button class="cyber-btn btn-sm btn-secondary" id="btnDownloadJson">📥 Export JSON</button>
+          </div>
+          <div class="report-paper" id="reportPaper">
+            <div class="empty-state-sm">Incident report will be automatically generated upon investigation completion.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Drawer: Correlated SIEM Logs & Telemetry -->
+  <footer class="telemetry-drawer" id="telemetryDrawer">
+    <div class="drawer-header" id="drawerToggle">
+      <div class="drawer-title">
+        <span class="telemetry-indicator">●</span> Correlated SIEM & CloudTrail Telemetry Logs
+        <span class="log-count-badge" id="logCountBadge">4 Events</span>
+      </div>
+      <button class="drawer-arrow-btn" id="drawerArrow">▲ Expand</button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <div class="log-table-container">
+        <table class="telemetry-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Source</th>
+              <th>Event / API Action</th>
+              <th>Actor / User</th>
+              <th>Source IP</th>
+              <th>Details & Indicators</th>
+            </tr>
+          </thead>
+          <tbody id="telemetryBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal for Custom Alert Injection -->
+  <div class="modal-overlay" id="customAlertModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Inject Custom Security Alert</h3>
+        <button class="modal-close" id="btnCloseModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="customAlertTitle">Alert Title:</label>
+          <input type="text" id="customAlertTitle" class="cyber-input" value="Suspicious Token Replay from Unknown VPC">
+        </div>
+        <div class="form-group">
+          <label for="customTargetNode">Target Graph Node:</label>
+          <select id="customTargetNode" class="cyber-select"></select>
+        </div>
+        <div class="form-group">
+          <label for="customSeverity">Severity:</label>
+          <select id="customSeverity" class="cyber-select">
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH" selected>HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="LOW">LOW</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="customDesc">Description & Indicators:</label>
+          <textarea id="customDesc" class="cyber-textarea" rows="3">Anomalous API request signature detected outside ordinary baseline patterns.</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cyber-btn btn-secondary" id="btnCancelModal">Cancel</button>
+        <button class="cyber-btn btn-primary" id="btnSubmitCustomAlert">Inject & Load</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toastNotification" style="display: none;"></div>
+
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
