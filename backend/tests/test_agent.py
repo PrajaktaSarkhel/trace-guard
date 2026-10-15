@@ -63,6 +63,11 @@ class TestTraceGuard(unittest.TestCase):
         self.assertTrue(res_risk["success"])
         self.assertGreater(res_risk["composite_risk_score"], 70.0)
 
+        # 5. FalkorDB Cypher tool
+        res_cypher = self.mcp.call_tool("falkordb_cypher_query", {"cypher": "MATCH (u:User)-[r]->(d) RETURN u, r, d"})
+        self.assertTrue(res_cypher["success"])
+        self.assertIn("cypher", res_cypher)
+
     def test_autonomous_agent_investigation(self):
         alert = self.scenario_data["alert"]
         events = []

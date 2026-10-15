@@ -211,6 +211,27 @@ def inject_custom_alert(req: CustomAlertRequest):
     active_scenario["alert"] = custom_alert
     return {"status": "injected", "alert": custom_alert.model_dump()}
 
+class CypherQueryRequest(BaseModel):
+    query: str
+    params: Optional[Dict[str, Any]] = None
+
+@app.post("/api/cypher")
+def execute_cypher_query(req: CypherQueryRequest):
+    """Executes an openCypher query directly on FalkorDB."""
+    return mcp_server.graph.query_cypher(req.query, req.params)
+
+@app.get("/api/falkordb/status")
+def get_falkordb_status():
+    """Returns FalkorDB connection status and active graph details."""
+    return {
+        "connected": mcp_server.graph.is_falkor_connected,
+        "host": mcp_server.graph.host,
+        "port": mcp_server.graph.port,
+        "graph_id": mcp_server.graph.graph_id,
+        "node_count": len(mcp_server.graph._nodes_meta),
+        "edge_count": len(mcp_server.graph._edges_meta)
+    }
+
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.exists(frontend_dir):
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")

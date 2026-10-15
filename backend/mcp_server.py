@@ -132,6 +132,24 @@ class TraceGuardMCPServer:
                     },
                     "required": ["action_type", "target_node_id", "reasoning"]
                 }
+            },
+            {
+                "name": "falkordb_cypher_query",
+                "description": "Execute openCypher queries directly on FalkorDB for custom graph pattern matching, multi-hop traversals, or algorithmic analytics.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "cypher": {
+                            "type": "string",
+                            "description": "Cypher query to execute (e.g. MATCH (u:User)-[r]->(d) RETURN u, r, d LIMIT 25)."
+                        },
+                        "params": {
+                            "type": "object",
+                            "description": "Optional key-value parameters for query binding."
+                        }
+                    },
+                    "required": ["cypher"]
+                }
             }
         ]
 
@@ -139,7 +157,12 @@ class TraceGuardMCPServer:
         """
         Executes an MCP tool and returns structured result.
         """
-        if tool_name == "security_graph_query":
+        if tool_name == "falkordb_cypher_query":
+            cypher = arguments.get("cypher", "")
+            params = arguments.get("params", {})
+            return self.graph.query_cypher(cypher, params)
+
+        elif tool_name == "security_graph_query":
             action = arguments.get("action")
             node_id = arguments.get("node_id")
 
