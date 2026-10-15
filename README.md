@@ -1,4 +1,4 @@
-# 🛡️ TraceGuard — Autonomous Security Incident Investigator
+# 🛡️ TraceGuard : Autonomous Security Incident Investigator
 
 > **Track:** *Agents That Act on Connected Data*  
 > **Primary Graph Database:** *FalkorDB (Low-Latency GraphBLAS Engine & openCypher)*  
@@ -255,7 +255,7 @@ In compliance with Rule 11 of Graph Hacks, AI coding assistants (Gemini / Antigr
 ## 👤 Author
 
 **Prajakta Sarkhel**  
-- GitHub: [@PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
+- GitHub: [PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
 - Project: [TraceGuard](https://github.com/PrajaktaSarkhel/trace-guard)
 
 ---

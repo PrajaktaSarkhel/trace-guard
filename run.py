@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TraceGuard — Autonomous Security Incident Investigator
+TraceGuard : Autonomous Security Incident Investigator
 Graph-Native Enterprise Incident Investigation & Automated Containment
 
 Run this script to start the TraceGuard SOC Command Center:
