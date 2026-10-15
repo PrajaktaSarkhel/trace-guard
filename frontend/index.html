@@ -3,16 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceGuard : Autonomous Security Incident Investigator</title>
+  <title>TraceGuard | Autonomous Security Incident Investigator</title>
   <meta name="description" content="Autonomous Security Incident Investigator leveraging multi-hop graph reasoning and Model Context Protocol (MCP) to reconstruct attack paths and orchestrate targeted containment.">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Cytoscape for Force-Directed Connected Data Graph -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <!-- Cytoscape for Force-Directed Connected Data Graph (Local + CDN fallback) -->
+  <script src="cytoscape.min.js"></script>
+  <script>
+    if (typeof cytoscape === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"><\/script>');
+    }
+  </script>
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css">
@@ -22,24 +27,34 @@
   <header class="soc-header">
     <div class="brand-container">
       <div class="brand-icon-shield">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <path d="M9 12l2 2 4-4" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 12l2 2 4-4" stroke="#00d2ff" stroke-width="2.5"/>
         </svg>
       </div>
-      <div>
-        <div class="brand-title">TraceGuard <span class="badge-track">Graph-Native SOC</span></div>
-        <div class="brand-subtitle">Autonomous Security Incident Investigator &bull; Multi-Hop Graph Reasoning via MCP</div>
+      <div class="brand-text-block">
+        <div class="brand-title">
+          <span>TraceGuard</span>
+          <span class="badge-track">Graph-Native SOC</span>
+        </div>
+        <div class="brand-subtitle">Autonomous Incident Investigator &bull; Multi-Hop Graph Reasoning via MCP</div>
       </div>
     </div>
 
     <!-- Scenario Selector -->
     <div class="scenario-selector-group">
-      <label for="scenarioSelect">Incident Scenario:</label>
+      <label for="scenarioSelect">
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <span>Incident Scenario</span>
+      </label>
       <select id="scenarioSelect" class="cyber-select">
-        <option value="scenario_lateral_exfil">1. Lateral Movement & S3 Exfiltration</option>
-        <option value="scenario_insider_sabotage">2. Insider Threat & Supply Chain Tampering</option>
-        <option value="scenario_ransomware_staging">3. Ransomware Precursor & Backup Hijacking</option>
+        <option value="scenario_lateral_exfil">Scenario 1: Lateral Movement & S3 Exfiltration</option>
+        <option value="scenario_insider_sabotage">Scenario 2: Insider Threat & Supply Chain Tampering</option>
+        <option value="scenario_ransomware_staging">Scenario 3: Ransomware Precursor & Backup Hijacking</option>
       </select>
     </div>
 
@@ -49,18 +64,29 @@
         <span class="pulse-dot"></span>
         <span class="status-text" id="agentStatusText">AGENT READY</span>
       </div>
-      <button id="btnInvestigate" class="cyber-btn btn-primary pulse-glow">
-        <span class="btn-icon">⚡</span> Start Autonomous Investigation
+      <button id="btnInvestigate" class="cyber-btn btn-primary" title="Execute multi-hop autonomous investigation">
+        <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>Start Autonomous Investigation</span>
       </button>
-      <button id="btnCustomAlert" class="cyber-btn btn-secondary">
-        <span class="btn-icon">🎯</span> Custom Alert
+      <button id="btnCustomAlert" class="cyber-btn btn-secondary" title="Inject custom security alert">
+        <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        <span>Custom Alert</span>
       </button>
     </div>
   </header>
 
   <!-- Alert Banner -->
   <section class="alert-trigger-bar" id="alertBar">
-    <div class="alert-badge critical" id="alertSeverity">CRITICAL</div>
+    <div class="alert-lead">
+      <div class="alert-badge critical" id="alertSeverity">CRITICAL</div>
+      <span class="alert-pulse-ring"></span>
+    </div>
     <div class="alert-info">
       <strong id="alertTitle">Critical: Impossible Travel & Anomalous Egress Detected</strong>
       <span class="alert-details" id="alertDesc">User 'alice.vance' authenticated from St. Petersburg, Russia (194.26.29.112)...</span>
@@ -78,12 +104,34 @@
       <div class="panel-header">
         <div class="panel-title-group">
           <h2 class="panel-title">Connected Security Topology Graph</h2>
-          <span class="panel-subtitle">Users &rarr; Devices &rarr; Sessions &rarr; Permissions &rarr; Files &rarr; IPs</span>
+          <span class="panel-subtitle">Identity &bull; Host &bull; Session &bull; Access &bull; Asset &bull; Adversary</span>
         </div>
         <div class="graph-controls">
-          <button id="btnFitGraph" class="icon-btn" title="Reset View">⛶ Fit</button>
-          <button id="btnHighlightPath" class="icon-btn" title="Highlight Attack Path">⚡ Attack Path</button>
-          <button id="btnToggleLayout" class="icon-btn" title="Toggle Layout">🔄 Re-Layout</button>
+          <button id="btnFitGraph" class="icon-btn" title="Reset View to Fit Graph">
+            <svg class="control-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+            <span>Fit</span>
+          </button>
+          <button id="btnHighlightPath" class="icon-btn" title="Highlight Discovered Attack Path">
+            <svg class="control-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="6" cy="6" r="3"/>
+              <circle cx="18" cy="9" r="3"/>
+              <line x1="6" y1="9" x2="6" y2="15"/>
+              <path d="M18 9a9 9 0 0 1-9 9"/>
+            </svg>
+            <span>Attack Path</span>
+          </button>
+          <button id="btnToggleLayout" class="icon-btn" title="Recalculate Graph Layout">
+            <svg class="control-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Re-Layout</span>
+          </button>
         </div>
       </div>
 
@@ -106,7 +154,7 @@
             <span class="hud-value" id="hudTotalNodes">--</span>
           </div>
           <div class="hud-metric">
-            <span class="hud-label">Bridge Choke Point</span>
+            <span class="hud-label">Choke Point Node</span>
             <span class="hud-value cyan" id="hudChokePoint">Analyzing...</span>
           </div>
         </div>
@@ -115,7 +163,12 @@
         <div class="node-inspector" id="nodeInspector" style="display: none;">
           <div class="inspector-header">
             <span class="inspector-type" id="inspectType">USER</span>
-            <button class="close-inspector" id="btnCloseInspector">&times;</button>
+            <button class="close-inspector" id="btnCloseInspector" title="Close Panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
           <h3 class="inspector-title" id="inspectLabel">Alice Vance</h3>
           <div class="inspector-risk-bar">
@@ -124,7 +177,13 @@
           </div>
           <div class="inspector-properties" id="inspectProps"></div>
           <div class="inspector-actions">
-            <button class="inspect-btn-quarantine" id="btnInspectAction">Remediate Entity</button>
+            <button class="inspect-btn-quarantine" id="btnInspectAction">
+              <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span>Remediate Entity</span>
+            </button>
           </div>
         </div>
 
@@ -134,7 +193,7 @@
           <div class="legend-item"><span class="legend-dot device"></span> Device</div>
           <div class="legend-item"><span class="legend-dot session"></span> Session</div>
           <div class="legend-item"><span class="legend-dot permission"></span> Permission</div>
-          <div class="legend-item"><span class="legend-dot file"></span> File/Vault</div>
+          <div class="legend-item"><span class="legend-dot file"></span> Asset / Vault</div>
           <div class="legend-item"><span class="legend-dot ip"></span> Adversary IP</div>
           <div class="legend-item"><span class="legend-ring crown"></span> Crown Jewel</div>
           <div class="legend-item"><span class="legend-ring contained"></span> Contained</div>
@@ -147,16 +206,36 @@
       <!-- Tabs -->
       <nav class="sidebar-tabs">
         <button class="tab-btn active" data-tab="reasoningTab">
-          <span class="tab-badge">1</span> Agent Reasoning
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          <span>Agent Reasoning</span>
         </button>
         <button class="tab-btn" data-tab="evidenceTab">
-          <span class="tab-badge" id="evidenceBadgeCount">0</span> Evidence Chain
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          <span>Evidence Chain</span>
+          <span class="tab-badge" id="evidenceBadgeCount">0</span>
         </button>
         <button class="tab-btn" data-tab="actionsTab">
-          <span class="tab-badge warning-badge" id="actionBadgeCount">0</span> Mitigation (HITL)
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <span>Mitigation</span>
+          <span class="tab-badge warning-badge" id="actionBadgeCount">0</span>
         </button>
         <button class="tab-btn" data-tab="reportTab">
-          <span class="tab-badge">Report</span>
+          <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>Forensic Report</span>
         </button>
       </nav>
 
@@ -164,16 +243,27 @@
       <div class="tab-content active" id="reasoningTab">
         <div class="reasoning-header">
           <div class="agent-mode-tag">
-            <span class="sparkle">✦</span> Multi-Hop ReAct Engine &bull; MCP Tools
+            <span class="status-indicator-dot"></span>
+            <span>Multi-Hop ReAct Engine &bull; MCP Protocol</span>
           </div>
           <div class="agent-timer" id="agentTimer">0.0s</div>
         </div>
 
         <div class="reasoning-stream" id="reasoningStream">
           <div class="empty-state" id="streamPlaceholder">
-            <div class="empty-icon">🛡️</div>
+            <div class="empty-state-graphic">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="32" cy="32" r="28" stroke="rgba(0, 210, 255, 0.2)" stroke-dasharray="3 3"/>
+                <circle cx="32" cy="32" r="18" stroke="rgba(0, 210, 255, 0.35)"/>
+                <circle cx="32" cy="32" r="8" stroke="rgba(0, 210, 255, 0.7)"/>
+                <line x1="32" y1="4" x2="32" y2="60" stroke="rgba(255, 255, 255, 0.08)"/>
+                <line x1="4" y1="32" x2="60" y2="32" stroke="rgba(255, 255, 255, 0.08)"/>
+                <line x1="32" y1="32" x2="52" y2="16" stroke="#00d2ff" stroke-width="2"/>
+                <circle cx="52" cy="16" r="3" fill="#00d2ff"/>
+              </svg>
+            </div>
             <h3>Autonomous Agent Standby</h3>
-            <p>Click <strong>Start Autonomous Investigation</strong> to watch TraceGuard traverse connected nodes, call MCP graph tools, and uncover the full attack narrative.</p>
+            <p>Select a scenario and click <strong>Start Autonomous Investigation</strong> to stream live multi-hop node traversals and MCP tool invocations.</p>
           </div>
         </div>
       </div>
@@ -182,9 +272,9 @@
       <div class="tab-content" id="evidenceTab">
         <div class="evidence-container">
           <div class="section-title-sm">Sequential Chain of Evidence</div>
-          <p class="section-desc">Mathematical path discovered through multi-hop graph queries:</p>
+          <p class="section-desc">Deterministic attack path reconstructed through FalkorDB openCypher graph traversals:</p>
           <div class="chain-timeline" id="chainTimeline">
-            <div class="empty-state-sm">No active evidence chain yet. Run an investigation.</div>
+            <div class="empty-state-sm">No active evidence chain yet. Run an investigation to generate forensic proof.</div>
           </div>
 
           <div class="section-title-sm mt-4">MITRE ATT&CK Matrix Mapping</div>
@@ -208,14 +298,14 @@
       <!-- Tab 3: Mitigation & Human-in-the-Loop Actions -->
       <div class="tab-content" id="actionsTab">
         <div class="actions-container">
-          <div class="section-title-sm">Automated Containment Actions</div>
-          <p class="section-desc">Immediate low-risk isolation executed by TraceGuard:</p>
+          <div class="section-title-sm">Automated Safe Containment</div>
+          <p class="section-desc">Immediate low-impact isolation executed autonomously by TraceGuard:</p>
           <div class="action-list" id="autoActionsList">
             <div class="empty-state-sm">No automated actions taken yet.</div>
           </div>
 
-          <div class="section-title-sm mt-4">Human-in-the-Loop (HITL) Approval Gate</div>
-          <p class="section-desc">Critical infrastructure actions requiring security analyst approval:</p>
+          <div class="section-title-sm mt-4">Human-in-the-Loop (HITL) Gate</div>
+          <p class="section-desc">High-impact infrastructure containment requiring explicit security analyst authorization:</p>
           <div class="action-list" id="pendingActionsList">
             <div class="empty-state-sm">No actions currently pending approval.</div>
           </div>
@@ -226,11 +316,24 @@
       <div class="tab-content" id="reportTab">
         <div class="report-container">
           <div class="report-actions-bar">
-            <button class="cyber-btn btn-sm btn-secondary" id="btnCopyReport">📋 Copy Markdown</button>
-            <button class="cyber-btn btn-sm btn-secondary" id="btnDownloadJson">📥 Export JSON</button>
+            <button class="cyber-btn btn-sm btn-secondary" id="btnCopyReport">
+              <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy Markdown</span>
+            </button>
+            <button class="cyber-btn btn-sm btn-secondary" id="btnDownloadJson">
+              <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Export JSON</span>
+            </button>
           </div>
           <div class="report-paper" id="reportPaper">
-            <div class="empty-state-sm">Incident report will be automatically generated upon investigation completion.</div>
+            <div class="empty-state-sm">Incident forensic report will be automatically generated upon investigation completion.</div>
           </div>
         </div>
       </div>
@@ -241,10 +344,16 @@
   <footer class="telemetry-drawer" id="telemetryDrawer">
     <div class="drawer-header" id="drawerToggle">
       <div class="drawer-title">
-        <span class="telemetry-indicator">●</span> Correlated SIEM & CloudTrail Telemetry Logs
+        <span class="telemetry-indicator"></span>
+        <span>Correlated SIEM & CloudTrail Telemetry Logs</span>
         <span class="log-count-badge" id="logCountBadge">4 Events</span>
       </div>
-      <button class="drawer-arrow-btn" id="drawerArrow">▲ Expand</button>
+      <button class="drawer-arrow-btn" id="drawerArrow">
+        <span id="drawerToggleText">Expand</span>
+        <svg class="chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
     </div>
     <div class="drawer-body" id="drawerBody">
       <div class="log-table-container">
@@ -269,20 +378,32 @@
   <div class="modal-overlay" id="customAlertModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Inject Custom Security Alert</h3>
-        <button class="modal-close" id="btnCloseModal">&times;</button>
+        <div class="modal-header-title">
+          <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <h3>Inject Custom Security Alert</h3>
+        </div>
+        <button class="modal-close" id="btnCloseModal" title="Close Modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="customAlertTitle">Alert Title:</label>
+          <label for="customAlertTitle">Alert Title</label>
           <input type="text" id="customAlertTitle" class="cyber-input" value="Suspicious Token Replay from Unknown VPC">
         </div>
         <div class="form-group">
-          <label for="customTargetNode">Target Graph Node:</label>
+          <label for="customTargetNode">Target Graph Node</label>
           <select id="customTargetNode" class="cyber-select"></select>
         </div>
         <div class="form-group">
-          <label for="customSeverity">Severity:</label>
+          <label for="customSeverity">Severity</label>
           <select id="customSeverity" class="cyber-select">
             <option value="CRITICAL">CRITICAL</option>
             <option value="HIGH" selected>HIGH</option>
@@ -291,7 +412,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="customDesc">Description & Indicators:</label>
+          <label for="customDesc">Description & Indicators</label>
           <textarea id="customDesc" class="cyber-textarea" rows="3">Anomalous API request signature detected outside ordinary baseline patterns.</textarea>
         </div>
       </div>

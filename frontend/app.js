@@ -11,11 +11,36 @@ let isInvestigating = false;
 let investigationTimer = null;
 let investigationStartTime = 0;
 
-// Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  initCytoscape();
-  setupEventListeners();
-  loadScenario(currentScenarioId);
+// Initialize when DOM is ready (handles interactive/complete states)
+function initApp() {
+  try {
+    initCytoscape();
+  } catch (err) {
+    console.error("Cytoscape init error:", err);
+  }
+  try {
+    setupEventListeners();
+  } catch (err) {
+    console.error("Event listeners error:", err);
+  }
+  try {
+    loadScenario(currentScenarioId);
+  } catch (err) {
+    console.error("Scenario load error:", err);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+
+window.addEventListener("resize", () => {
+  if (cy) {
+    cy.resize();
+    cy.fit(null, 40);
+  }
 });
 
 // =========================================================================
@@ -24,6 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
 function initCytoscape() {
   const container = document.getElementById("cy");
   if (!container) return;
+
+  if (typeof cytoscape === "undefined") {
+    console.error("Cytoscape library not loaded");
+    showToast("Cytoscape engine loading...", true);
+    return;
+  }
 
   cy = cytoscape({
     container: container,
@@ -34,20 +65,20 @@ function initCytoscape() {
         selector: 'node',
         style: {
           'label': 'data(label)',
-          'color': '#f0f4f8',
-          'font-family': 'Outfit, sans-serif',
+          'color': '#f8fafc',
+          'font-family': 'Inter, sans-serif',
           'font-size': '11px',
           'font-weight': 600,
           'text-valign': 'bottom',
-          'text-margin-y': 6,
-          'text-background-color': '#0d121d',
-          'text-background-opacity': 0.8,
-          'text-background-padding': 3,
+          'text-margin-y': 7,
+          'text-background-color': '#080d18',
+          'text-background-opacity': 0.85,
+          'text-background-padding': 4,
           'text-background-shape': 'roundrectangle',
           'border-width': 2,
-          'border-color': 'rgba(255, 255, 255, 0.2)',
+          'border-color': 'rgba(255, 255, 255, 0.22)',
           'transition-property': 'background-color, border-color, width, height, border-width',
-          'transition-duration': '0.3s'
+          'transition-duration': '0.25s'
         }
       },
       // Type-based Node Shapes & Colors
@@ -55,16 +86,16 @@ function initCytoscape() {
         selector: 'node[type = "USER"]',
         style: {
           'shape': 'ellipse',
-          'background-color': '#00f2fe',
-          'width': 42,
-          'height': 42
+          'background-color': '#00d2ff',
+          'width': 44,
+          'height': 44
         }
       },
       {
         selector: 'node[type = "DEVICE"]',
         style: {
           'shape': 'roundrectangle',
-          'background-color': '#4facfe',
+          'background-color': '#38bdf8',
           'width': 44,
           'height': 44
         }
@@ -73,16 +104,16 @@ function initCytoscape() {
         selector: 'node[type = "SESSION"]',
         style: {
           'shape': 'diamond',
-          'background-color': '#ffaa00',
-          'width': 40,
-          'height': 40
+          'background-color': '#f59e0b',
+          'width': 42,
+          'height': 42
         }
       },
       {
         selector: 'node[type = "PERMISSION"]',
         style: {
           'shape': 'hexagon',
-          'background-color': '#ffea00',
+          'background-color': '#eab308',
           'width': 44,
           'height': 44
         }
@@ -91,7 +122,7 @@ function initCytoscape() {
         selector: 'node[type = "FILE"]',
         style: {
           'shape': 'barrel',
-          'background-color': '#ff007f',
+          'background-color': '#ec4899',
           'width': 42,
           'height': 42
         }
@@ -100,7 +131,7 @@ function initCytoscape() {
         selector: 'node[type = "IP"]',
         style: {
           'shape': 'triangle',
-          'background-color': '#ff334b',
+          'background-color': '#f43f5e',
           'width': 46,
           'height': 46
         }
@@ -109,7 +140,7 @@ function initCytoscape() {
       {
         selector: 'node[status = "compromised"]',
         style: {
-          'border-color': '#ff334b',
+          'border-color': '#f43f5e',
           'border-width': 4,
           'border-opacity': 1
         }
@@ -117,14 +148,14 @@ function initCytoscape() {
       {
         selector: 'node[status = "suspicious"]',
         style: {
-          'border-color': '#ffaa00',
+          'border-color': '#f59e0b',
           'border-width': 3
         }
       },
       {
         selector: 'node[status = "contained"]',
         style: {
-          'background-color': '#00e676 !important',
+          'background-color': '#10b981 !important',
           'border-color': '#ffffff',
           'border-width': 4
         }
@@ -133,7 +164,7 @@ function initCytoscape() {
       {
         selector: 'node[?crown_jewel]',
         style: {
-          'border-color': '#ffd700',
+          'border-color': '#fbbf24',
           'border-width': 4
         }
       },
@@ -141,10 +172,10 @@ function initCytoscape() {
       {
         selector: 'node.active-hop',
         style: {
-          'border-color': '#00f2fe',
-          'border-width': 6,
-          'width': 54,
-          'height': 54
+          'border-color': '#00d2ff',
+          'border-width': 5,
+          'width': 52,
+          'height': 52
         }
       },
       // Edge Styles
@@ -152,7 +183,7 @@ function initCytoscape() {
         selector: 'edge',
         style: {
           'width': 2,
-          'line-color': 'rgba(255, 255, 255, 0.2)',
+          'line-color': 'rgba(255, 255, 255, 0.18)',
           'target-arrow-color': 'rgba(255, 255, 255, 0.4)',
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier',
@@ -160,9 +191,9 @@ function initCytoscape() {
           'label': 'data(type)',
           'font-family': 'JetBrains Mono, monospace',
           'font-size': '8px',
-          'color': '#8899ac',
-          'text-background-color': '#070a10',
-          'text-background-opacity': 0.8,
+          'color': '#94a3b8',
+          'text-background-color': '#090d16',
+          'text-background-opacity': 0.85,
           'text-background-padding': 2,
           'text-rotation': 'autorotate'
         }
@@ -171,9 +202,9 @@ function initCytoscape() {
       {
         selector: 'edge.attack-path-edge',
         style: {
-          'width': 4,
-          'line-color': '#ff334b',
-          'target-arrow-color': '#ff334b',
+          'width': 3,
+          'line-color': '#f43f5e',
+          'target-arrow-color': '#f43f5e',
           'line-style': 'dashed'
         }
       }
@@ -216,10 +247,22 @@ async function loadScenario(scenarioId) {
     updateAlertBanner(data.alert);
 
     // Refresh Cytoscape Graph
-    if (cy && data.graph_elements) {
-      cy.elements().remove();
-      cy.add(data.graph_elements);
-      runGraphLayout();
+    if (data.graph_elements) {
+      if (!cy) {
+        initCytoscape();
+      }
+      if (cy) {
+        cy.elements().remove();
+        cy.add(data.graph_elements);
+        cy.resize();
+        runGraphLayout();
+        setTimeout(() => {
+          if (cy) {
+            cy.resize();
+            cy.fit(null, 40);
+          }
+        }, 150);
+      }
       updateGraphHUD();
       populateCustomAlertNodes(data.graph_elements);
     }
@@ -239,14 +282,26 @@ async function loadScenario(scenarioId) {
 
 function runGraphLayout(layoutName = 'cose') {
   if (!cy) return;
-  cy.layout({
-    name: layoutName,
-    animate: true,
-    animationDuration: 700,
-    nodeRepulsion: 7000,
-    idealEdgeLength: 110,
-    padding: 50
-  }).run();
+  try {
+    const layout = cy.layout({
+      name: layoutName,
+      animate: true,
+      animationDuration: 600,
+      nodeRepulsion: 6500,
+      idealEdgeLength: 100,
+      padding: 50,
+      stop: () => {
+        if (cy) {
+          cy.resize();
+          cy.fit(null, 40);
+        }
+      }
+    });
+    layout.run();
+  } catch (err) {
+    console.warn("Layout failed, falling back to concentric:", err);
+    cy.layout({ name: 'concentric', padding: 40 }).run();
+  }
 }
 
 function updateAlertBanner(alert) {
@@ -263,19 +318,24 @@ function updateGraphHUD() {
   const nodes = cy.nodes();
   const crownJewels = nodes.filter(n => n.data('crown_jewel') === true);
 
-  document.getElementById("hudTotalNodes").textContent = `${nodes.length} Nodes / ${cy.edges().length} Edges`;
-  document.getElementById("hudCrownJewels").textContent = `${crownJewels.length} Assets`;
+  const totalNodesElem = document.getElementById("hudTotalNodes");
+  const crownJewelsElem = document.getElementById("hudCrownJewels");
+  if (totalNodesElem) totalNodesElem.textContent = `${nodes.length} Nodes / ${cy.edges().length} Edges`;
+  if (crownJewelsElem) crownJewelsElem.textContent = `${crownJewels.length} Assets`;
 
   // Fetch Centrality from API
   fetch('/api/graph')
     .then(r => r.json())
     .then(res => {
       const topBridge = res.centrality?.top_bridge_nodes?.[0];
-      if (topBridge) {
-        document.getElementById("hudChokePoint").textContent = `${topBridge.label.split(' ')[0]} (${topBridge.betweenness_score})`;
+      const chokeElem = document.getElementById("hudChokePoint");
+      if (topBridge && chokeElem) {
+        chokeElem.textContent = `${topBridge.label.split(' ')[0]} (${topBridge.betweenness_score})`;
       }
     })
-    .catch(() => {});
+    .catch((err) => {
+      console.warn("Could not fetch centrality:", err);
+    });
 }
 
 // =========================================================================
@@ -370,15 +430,26 @@ function handleInvestigationStep(step) {
   // Create Step Card
   const card = document.createElement("div");
   card.className = "step-card";
+  
+  const discoveredHtml = step.discovered_nodes && step.discovered_nodes.length > 0
+    ? step.discovered_nodes.map(n => `<span class="discovered-node-chip">${escapeHtml(n)}</span>`).join('')
+    : '<span class="text-dim">None</span>';
+
   card.innerHTML = `
     <div class="step-header">
       <span class="step-hop-pill">HOP ${step.hop_number}</span>
-      <span class="step-tactic-tag">${step.mitre_tactic || 'Reasoning'}</span>
+      <span class="step-tactic-tag">${escapeHtml(step.mitre_tactic || 'Graph Traversal')}</span>
     </div>
     <div class="step-thought">${escapeHtml(step.thought)}</div>
     <div class="step-tool-call">
-      <span class="tool-name-badge">MCP Tool:</span> ${escapeHtml(step.tool_called)}
-      <div class="step-tool-output">Discovered Nodes: ${step.discovered_nodes ? step.discovered_nodes.join(', ') : 'None'}</div>
+      <div class="step-tool-lead">
+        <span class="tool-name-badge">MCP Tool</span>
+        <code class="tool-name-code">${escapeHtml(step.tool_called)}</code>
+      </div>
+      <div class="step-tool-output">
+        <span class="output-label">Discovered Entities:</span>
+        <div class="discovered-nodes-wrapper">${discoveredHtml}</div>
+      </div>
     </div>
   `;
   streamContainer.appendChild(card);
@@ -475,17 +546,20 @@ function renderEvidenceChain(chain) {
   const container = document.getElementById("chainTimeline");
   document.getElementById("evidenceBadgeCount").textContent = chain ? chain.length : 0;
   if (!chain || chain.length === 0) {
-    container.innerHTML = '<div class="empty-state-sm">No evidence chain found.</div>';
+    container.innerHTML = '<div class="empty-state-sm">No active evidence chain yet. Run an investigation to generate forensic proof.</div>';
     return;
   }
 
   container.innerHTML = '';
-  chain.forEach(item => {
+  chain.forEach((item, index) => {
     const card = document.createElement("div");
     card.className = "chain-node-card";
     card.innerHTML = `
       <div class="chain-node-title">
-        <span>${escapeHtml(item.label)}</span>
+        <div class="chain-node-left">
+          <span class="chain-node-index">${index + 1}</span>
+          <span class="chain-node-name">${escapeHtml(item.label)}</span>
+        </div>
         <span class="chain-node-role">${escapeHtml(item.role)}</span>
       </div>
       <div class="chain-node-desc">${escapeHtml(item.findings)}</div>
@@ -561,7 +635,10 @@ function renderMitigationActions(executedActions, pendingActions) {
         </div>
         <div class="action-reasoning">${escapeHtml(act.reasoning)}</div>
         <button class="btn-approve-action" data-action-id="${act.action_id}">
-          ✅ Approve & Execute Containment
+          <svg class="btn-action-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Authorize Containment</span>
         </button>
       `;
       const btn = card.querySelector(".btn-approve-action");
@@ -612,21 +689,33 @@ function renderIncidentReportPaper(report) {
   if (!report) return;
 
   paper.innerHTML = `
-    <h2>Security Incident Forensic Report: ${escapeHtml(report.incident_id)}</h2>
-    <p><strong>Severity:</strong> <span class="alert-badge critical">${escapeHtml(report.severity)}</span> &bull; 
-       <strong>Investigated in:</strong> ${report.investigation_duration_sec}s</p>
+    <div class="report-header-card">
+      <div class="report-badge-row">
+        <span class="report-id-tag">Forensic Case: ${escapeHtml(report.incident_id)}</span>
+        <span class="alert-badge critical">${escapeHtml(report.severity)}</span>
+      </div>
+      <div class="report-meta-text">Investigated and correlated in ${report.investigation_duration_sec}s</div>
+    </div>
     
-    <h3>Executive Summary</h3>
-    <p>${escapeHtml(report.summary)}</p>
+    <div class="report-block">
+      <h4>Executive Summary</h4>
+      <p>${escapeHtml(report.summary)}</p>
+    </div>
 
-    <h3>Attack Narrative & Findings</h3>
-    <p>${escapeHtml(report.attack_narrative)}</p>
+    <div class="report-block">
+      <h4>Attack Narrative & Findings</h4>
+      <p>${escapeHtml(report.attack_narrative)}</p>
+    </div>
 
-    <h3>Blast Radius Analysis</h3>
-    <p>Score: <strong>${report.blast_radius?.blast_radius_score || 85}/100</strong> &bull; Total Assets at Risk: <strong>${report.blast_radius?.total_reachable_assets || 0}</strong></p>
+    <div class="report-block">
+      <h4>Blast Radius Analysis</h4>
+      <p>Risk Score: <strong>${report.blast_radius?.blast_radius_score || 85}/100</strong> &bull; Total Assets Reachable: <strong>${report.blast_radius?.total_reachable_assets || 0}</strong></p>
+    </div>
 
-    <h3>Actions & Containment</h3>
-    <p>Executed: <strong>${report.actions_taken?.length || 0}</strong> &bull; Pending Analyst Approval: <strong>${report.pending_actions?.length || 0}</strong></p>
+    <div class="report-block">
+      <h4>Containment & Safeguards</h4>
+      <p>Automated Actions Executed: <strong>${report.actions_taken?.length || 0}</strong> &bull; Pending Analyst Approval: <strong>${report.pending_actions?.length || 0}</strong></p>
+    </div>
   `;
 }
 
@@ -656,7 +745,14 @@ function showNodeInspector(nodeData) {
 
   // Remediation button
   const actBtn = document.getElementById("btnInspectAction");
-  actBtn.textContent = nodeData.status === 'contained' ? 'Entity Contained' : `Quarantine ${nodeData.type}`;
+  const isContained = nodeData.status === 'contained';
+  actBtn.innerHTML = `
+    <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    <span>${isContained ? 'Entity Contained' : `Quarantine ${nodeData.type}`}</span>
+  `;
   actBtn.onclick = () => {
     if (nodeData.status !== 'contained') {
       approveActionDirect(nodeData.id);
@@ -829,9 +925,11 @@ function setupEventListeners() {
   // Bottom Telemetry Drawer Toggle
   document.getElementById("drawerToggle").addEventListener("click", () => {
     const drawer = document.getElementById("telemetryDrawer");
-    const arrow = document.getElementById("drawerArrow");
-    drawer.classList.toggle("expanded");
-    arrow.textContent = drawer.classList.contains("expanded") ? "▼ Collapse" : "▲ Expand";
+    const toggleText = document.getElementById("drawerToggleText");
+    const isExpanded = drawer.classList.toggle("expanded");
+    if (toggleText) {
+      toggleText.textContent = isExpanded ? "Collapse" : "Expand";
+    }
   });
 
   // Custom Alert Modal
@@ -870,9 +968,19 @@ function setupEventListeners() {
 function resetInvestigationState() {
   document.getElementById("reasoningStream").innerHTML = `
     <div class="empty-state" id="streamPlaceholder">
-      <div class="empty-icon">🛡️</div>
+      <div class="empty-state-graphic">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="32" cy="32" r="28" stroke="rgba(0, 210, 255, 0.2)" stroke-dasharray="3 3"/>
+          <circle cx="32" cy="32" r="18" stroke="rgba(0, 210, 255, 0.35)"/>
+          <circle cx="32" cy="32" r="8" stroke="rgba(0, 210, 255, 0.7)"/>
+          <line x1="32" y1="4" x2="32" y2="60" stroke="rgba(255, 255, 255, 0.08)"/>
+          <line x1="4" y1="32" x2="60" y2="32" stroke="rgba(255, 255, 255, 0.08)"/>
+          <line x1="32" y1="32" x2="52" y2="16" stroke="#00d2ff" stroke-width="2"/>
+          <circle cx="52" cy="16" r="3" fill="#00d2ff"/>
+        </svg>
+      </div>
       <h3>Autonomous Agent Standby</h3>
-      <p>Click <strong>Start Autonomous Investigation</strong> to watch TraceGuard traverse connected nodes, call MCP graph tools, and uncover the full attack narrative.</p>
+      <p>Select a scenario and click <strong>Start Autonomous Investigation</strong> to stream live multi-hop node traversals and MCP tool invocations.</p>
     </div>
   `;
   document.getElementById("chainTimeline").innerHTML = '<div class="empty-state-sm">No active evidence chain yet. Run an investigation.</div>';

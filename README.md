@@ -1,4 +1,4 @@
-# 🛡️ TraceGuard : Autonomous Security Incident Investigator
+# TraceGuard : Autonomous Security Incident Investigator
 
 > **Track:** *Agents That Act on Connected Data*  
 > **Primary Graph Database:** *FalkorDB (Low-Latency GraphBLAS Engine & openCypher)*  
@@ -13,13 +13,13 @@
 
 ---
 
-## 📌 The Problem & Motivation
+## The Problem & Motivation
 
 Traditional Security Information and Event Management (SIEM) and Security Orchestration (SOAR) platforms generate thousands of alerts in isolation. Security Analysts are forced to manually correlate disjointed tables: *Who logged in? From what laptop? Which IAM role did they assume? What files did they read? Where was the data transferred?*
 
 **TraceGuard transforms security investigations from disconnected log searches into autonomous graph traversals powered by FalkorDB.**
 
-### 🎯 Core Engineering Innovations
+### Core Engineering Innovations
 
 | Engineering Capability | How TraceGuard Solves It |
 | :--- | :--- |
@@ -31,7 +31,7 @@ Traditional Security Information and Event Management (SIEM) and Security Orches
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
                       ┌──────────────────────────────────────────────┐
@@ -71,7 +71,7 @@ Traditional Security Information and Event Management (SIEM) and Security Orches
 
 ---
 
-## 🌐 FalkorDB Graph Data Model
+## FalkorDB Graph Data Model
 
 TraceGuard models the enterprise IT and security ecosystem as a typed property directed graph in FalkorDB:
 
@@ -94,7 +94,7 @@ TraceGuard models the enterprise IT and security ecosystem as a typed property d
 
 ---
 
-## ⚡ Core Cypher Queries & Graph Algorithms in FalkorDB
+## Core Cypher Queries & Graph Algorithms in FalkorDB
 
 TraceGuard's reasoning engine depends on real Cypher queries executed against FalkorDB:
 
@@ -140,7 +140,7 @@ LIMIT 5;
 
 ---
 
-## 🧰 MCP Tool Specifications
+## MCP Tool Specifications
 
 TraceGuard implements the Model Context Protocol (MCP) with 6 production-grade tools:
 
@@ -159,7 +159,7 @@ TraceGuard implements the Model Context Protocol (MCP) with 6 production-grade t
 
 ---
 
-## 🎬 Enterprise Threat Scenarios
+## Enterprise Threat Scenarios
 
 1. **Scenario 1: Lateral Movement & S3 Data Exfiltration**
    - *Alert:* Impossible Travel Login for Alice Vance (`usr-alice`) from St. Petersburg, Russia.
@@ -178,7 +178,7 @@ TraceGuard implements the Model Context Protocol (MCP) with 6 production-grade t
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### 1. Prerequisites
 - Python 3.10+ (Tested on Python 3.13)
@@ -225,7 +225,7 @@ The application will start at **`http://127.0.0.1:8000`** and automatically open
 
 ---
 
-## 🧪 Running Automated Tests
+## Running Automated Tests
 
 TraceGuard includes a comprehensive test suite verifying FalkorDB Cypher execution, graph algorithms, MCP tool schemas, autonomous investigation loops, and REST endpoints:
 
@@ -235,24 +235,24 @@ python -m unittest discover -s backend/tests
 
 ---
 
-## 💡 Interactive SOC Walkthrough (Live Demonstration)
+## Interactive SOC Walkthrough (Live Demonstration)
 
 1. **Select a Scenario**: In the top navigation bar, choose `1. Lateral Movement & S3 Exfiltration`. Notice the alert details and connected topology graph loaded on screen.
-2. **Start Investigation**: Click **⚡ Start Autonomous Investigation**.
+2. **Start Investigation**: Click **Start Autonomous Investigation**.
 3. **Watch Multi-Hop Traversal**: Observe the live agent stream on the right. Watch the agent traverse from User Alice ➔ Rogue Session ➔ Shared Bastion Host ➔ IAM Admin Role ➔ Customer SSN Parquet Vault ➔ Adversary C2 IP.
-4. **Inspect Graph Highlights**: See nodes glow and change risk colors in real time. Click on any node (e.g. `srv-bastion-prod` or `customers_ssn_vault_2026.parquet`) to view its deep forensic metadata.
-5. **Human-in-the-Loop Mitigation**: Switch to the **Mitigation (HITL)** tab. Review the pending action: `Detach IAM policy and revoke elevated access`. Click **✅ Approve & Execute Containment**. Watch the node immediately turn neon green (`CONTAINED`) across the entire SOC graph!
-6. **Export Report**: Switch to the **Report** tab to view the generated forensic summary or click **📋 Copy Markdown** / **📥 Export JSON**.
+4. **Inspect Graph Highlights**: See nodes highlight and change risk colors in real time. Click on any node (e.g. `srv-bastion-prod` or `customers_ssn_vault_2026.parquet`) to view its deep forensic metadata.
+5. **Human-in-the-Loop Mitigation**: Switch to the **Mitigation (HITL)** tab. Review the pending action: `Detach IAM policy and revoke elevated access`. Click **Authorize Containment**. Watch the node immediately update to `CONTAINED` across the entire SOC graph!
+6. **Export Report**: Switch to the **Forensic Report** tab to view the generated forensic summary or click **Copy Markdown** / **Export JSON**.
 
 ---
 
-## 🤖 AI Assistant Disclosure (Rule 11 Compliance)
+## AI Assistant Disclosure (Rule 11 Compliance)
 
 In compliance with Rule 11 of Graph Hacks, AI coding assistants (Gemini / Antigravity) were utilized during the development of this project for initial code scaffolding, rapid prototyping, and test suite generation. The graph data model, Cypher queries, multi-hop investigation logic, and architectural design were directed, verified, and integrated by the author.
 
 ---
 
-## 👤 Author
+## Author
 
 **Prajakta Sarkhel**  
 - GitHub: [PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
@@ -260,6 +260,6 @@ In compliance with Rule 11 of Graph Hacks, AI coding assistants (Gemini / Antigr
 
 ---
 
-## 📄 License
+## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
