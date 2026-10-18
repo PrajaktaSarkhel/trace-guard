@@ -42,3 +42,6 @@ yarn-error.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Drafts
+BLOG_POST.md

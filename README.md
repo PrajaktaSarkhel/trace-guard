@@ -7,6 +7,7 @@
 > *An autonomous AI security agent that investigates suspicious enterprise activity through multi-hop graph reasoning, executes Cypher queries and graph algorithms via Model Context Protocol (MCP) tools, and orchestrates targeted containment with explainable forensic evidence.*
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-trace--guard--soc.onrender.com-00c853?style=for-the-badge&logo=render&logoColor=white)](https://trace-guard-soc.onrender.com/)
+[![Article](https://img.shields.io/badge/Read%20Article-Dev.to-black?style=for-the-badge&logo=devdotto&logoColor=white)](https://dev.to/prajaktasarkhel/building-traceguard-how-i-built-an-autonomous-security-incident-investigator-with-falkordb-mcp-2pc0)
 [![Track](https://img.shields.io/badge/Track-Agents%20That%20Act%20on%20Connected%20Data-blueviolet?style=for-the-badge)](https://github.com/PrajaktaSarkhel/trace-guard)
 [![FalkorDB](https://img.shields.io/badge/Graph%20Database-FalkorDB%20(Cypher)-ff0055?style=for-the-badge)](https://falkordb.com)
 [![Protocol](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol%20(MCP)-00f2fe?style=for-the-badge)](https://modelcontextprotocol.io)
@@ -262,6 +263,7 @@ In compliance with Rule 11 of Graph Hacks, AI coding assistants (Gemini / Antigr
 - GitHub: [PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
 - Project: [TraceGuard](https://github.com/PrajaktaSarkhel/trace-guard)
 - Live Deployment: [trace-guard-soc.onrender.com](https://trace-guard-soc.onrender.com/)
+- Blog / Architecture Deep-Dive: [Dev.to Article](https://dev.to/prajaktasarkhel/building-traceguard-how-i-built-an-autonomous-security-incident-investigator-with-falkordb-mcp-2pc0)
 
 ---
 
