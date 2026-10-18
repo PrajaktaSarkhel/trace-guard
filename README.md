@@ -2,9 +2,11 @@
 
 > **Track:** *Agents That Act on Connected Data*  
 > **Primary Graph Database:** *FalkorDB (Low-Latency GraphBLAS Engine & openCypher)*  
+> **Live Demo:** **[https://trace-guard-soc.onrender.com/](https://trace-guard-soc.onrender.com/)**  
 >
 > *An autonomous AI security agent that investigates suspicious enterprise activity through multi-hop graph reasoning, executes Cypher queries and graph algorithms via Model Context Protocol (MCP) tools, and orchestrates targeted containment with explainable forensic evidence.*
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-trace--guard--soc.onrender.com-00c853?style=for-the-badge&logo=render&logoColor=white)](https://trace-guard-soc.onrender.com/)
 [![Track](https://img.shields.io/badge/Track-Agents%20That%20Act%20on%20Connected%20Data-blueviolet?style=for-the-badge)](https://github.com/PrajaktaSarkhel/trace-guard)
 [![FalkorDB](https://img.shields.io/badge/Graph%20Database-FalkorDB%20(Cypher)-ff0055?style=for-the-badge)](https://falkordb.com)
 [![Protocol](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol%20(MCP)-00f2fe?style=for-the-badge)](https://modelcontextprotocol.io)
@@ -180,6 +182,8 @@ TraceGuard implements the Model Context Protocol (MCP) with 6 production-grade t
 
 ## Quick Start Guide
 
+> 🌐 **Instant Live Deployment:** You can test the live application immediately without local setup at **[https://trace-guard-soc.onrender.com/](https://trace-guard-soc.onrender.com/)**.
+
 ### 1. Prerequisites
 - Python 3.10+ (Tested on Python 3.13)
 - [Docker](https://www.docker.com/) (for running FalkorDB locally) or a [FalkorDB Cloud](https://app.falkordb.cloud/) instance
@@ -257,6 +261,7 @@ In compliance with Rule 11 of Graph Hacks, AI coding assistants (Gemini / Antigr
 **Prajakta Sarkhel**  
 - GitHub: [PrajaktaSarkhel](https://github.com/PrajaktaSarkhel)
 - Project: [TraceGuard](https://github.com/PrajaktaSarkhel/trace-guard)
+- Live Deployment: [trace-guard-soc.onrender.com](https://trace-guard-soc.onrender.com/)
 
 ---
 
